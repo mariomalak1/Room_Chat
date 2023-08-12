@@ -27,6 +27,10 @@ class RoomView(APIView):
 
     # create new room
     def post(self, request):
+        token = CustomAuthentication.get_token_or_none(request)
+        user_ = None
+        if token:
+            user_ = token.user
         data = request.data
         serializer = RoomSerializer(data=data)
         if serializer.is_valid():
