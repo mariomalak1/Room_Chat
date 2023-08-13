@@ -33,11 +33,12 @@ class RoomView(APIView):
         token = CustomAuthentication.get_token_or_none(request)
         if not token:
             return Response({"error":"you must be authorized"}, status=status.HTTP_401_UNAUTHORIZED)
-        user_ = token.user
         data = request.data.copy()
-        data["created_by"] = user_.id
+        data["created_by"] = token.user.id
+
         serializer = RoomSerializer(data=data)
         if serializer.is_valid():
+            print(serializer.validated_data)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
@@ -62,15 +63,12 @@ class MessageView(APIView):
         data = request.data.copy()
         data["room"] = room.id
         data["sender"] = token.user.id
-
         serializer = MessagesSerializer(data=data)
+
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        return Response({"Done":"ok"})
-
 
 
